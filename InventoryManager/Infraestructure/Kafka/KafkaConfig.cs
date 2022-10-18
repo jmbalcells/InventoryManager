@@ -16,7 +16,12 @@ namespace Infraestructure.Kafka
         {
             BootstrapServers = _configuration["KafkaConfig.Endpoint"],
             SaslUsername = _configuration["KafkaConfig.User"],
-            SaslPassword = _configuration["KafkaConfig.Password"]
+            SaslPassword = _configuration["KafkaConfig.Password"],
+            SecurityProtocol = SecurityProtocol.SaslSsl,
+            SaslMechanism = SaslMechanism.ScramSha512,
+            SslCaLocation = _configuration["KafkaConfig.Location"],
+            SocketTimeoutMs = int.Parse(_configuration["KafkaConfig.Timeout"]),
+            Partitioner = Partitioner.Random
         };
     }
 }
