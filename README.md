@@ -18,7 +18,7 @@ A general purpose inventory management API. Built in C# NET6 with Entity Framewo
 
 >### **Instructions to Authenticate**
 ---
-1. Execute de `/Auth` endpoint using this json:
+1. Execute the `/Auth` endpoint using this json:
 ```
 {
   "userName": "admin",
