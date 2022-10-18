@@ -1,3 +1,4 @@
+using Infraestructure.Security;
 using InventoryManager.Domain.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,10 +31,32 @@ namespace InventoryManager
         {
             services.AddControllers();
             services.AddDbContext<InventoryContext>(opt => opt.UseInMemoryDatabase("ItemList"));
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    );
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "InventoryManagerAPI", Version = "v2" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
             });
+
+            HelperToken helper = new HelperToken(this.Configuration);
+            services.AddAuthentication(helper.GetAuthOptions())
+                .AddJwtBearer(helper.GetJwtOptions());
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,11 +78,15 @@ namespace InventoryManager
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
+
+            app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers().RequireCors("CorsPolicy");
             });
         }
     }

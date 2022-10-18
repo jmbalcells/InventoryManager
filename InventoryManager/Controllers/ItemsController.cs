@@ -3,21 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Confluent.Kafka;
+using Infraestructure.Kafka;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 using InventoryManager.Domain.Models;
 
 namespace InventoryManager.Controllers
 {
-    [ApiController]
+
     [Route("[controller]")]
+    [ApiController]
+    [Authorize(Roles = "User")]
     public class ItemsController : ControllerBase
     {
         private readonly InventoryContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ItemsController(InventoryContext context)
+        public ItemsController(InventoryContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -34,7 +41,7 @@ namespace InventoryManager.Controllers
         /// </summary>
         /// <param name="name"></param>
         [HttpGet("Detail")]
-        public async Task<ActionResult<Item>> GetItem(string? name)
+        public async Task<ActionResult<Item>> GetItem(string name)
         {
             if (name == null || _context.Items == null)
             {
@@ -77,8 +84,8 @@ namespace InventoryManager.Controllers
         /// Delete an item by name
         /// </summary>
         /// <param name="name"></param>
-        [HttpPost("Delete")]
-        public async Task<ActionResult> Delete(string name)
+        [HttpPost("Take")]
+        public async Task<ActionResult> Take(string name)
         {
             if (_context.Items == null)
             {
@@ -91,6 +98,12 @@ namespace InventoryManager.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            using (var producer = new ProducerBuilder<string, string>(KafkaConfig.config).Build())
+            {
+                producer.ProduceAsync(_configuration["KafkaConfig:Topic"], new Message<string, string> { Key = "Delete", Value = "variable_item.id" });
+            }
+
             return RedirectToAction(nameof(GetItems));
         }
     }
