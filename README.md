@@ -18,7 +18,7 @@ A general purpose inventory management API. Built in C# NET6 with Entity Framewo
 
 >### **Instructions to Authenticate**
 ---
-1. Execute de `/Auth` endpoint using this json:
+1. Execute the `/Auth` endpoint using this json:
 ```
 {
   "userName": "admin",
@@ -36,7 +36,7 @@ A general purpose inventory management API. Built in C# NET6 with Entity Framewo
 
 >### **Assumptions**
 ---
-We assume that we have configured a Kafka client for creating events. In the appsettings.json there are the connection parameters and in the code the producer of the event is called.
+We assume that we have configured a Kafka instance for creating events. In the appsettings.json there are the connection parameters and in the code the producer of the event is called.
 
 >### **Addicional content**
 ---
