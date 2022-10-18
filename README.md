@@ -4,7 +4,7 @@ A general purpose inventory management API. Built in C# NET6 with Entity Framewo
 
 >### **Endpoints**
 ---
-+ (POST) `/Auth` - Get the autorization Token to use the endpoints.
++ (POST) `/Auth` - Get the authorization Token to use the endpoints.
 + (GET)  `/Items` - Get all the items from the inventory manager.
 + (POST) `/Items` - Create a new item to inventory manager.
 + (GET)  `/Items/Detail` - Get the details from an item by name.
